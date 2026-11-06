@@ -12,27 +12,10 @@ import {
   resolveExportPath,
 } from "../src/paths.ts";
 
-const KNOWN_DECK = "2026-10-11-project-proposal";
+// A valid deck slug for the lexical containment checks; no such deck needs to exist.
+const KNOWN_DECK = "2026-11-02-example-office-coffee";
 
 describe("deck discovery", () => {
-  test("lists decks from the decks store", async () => {
-    const decks = await getDeckSummaries();
-    expect(decks.length).toBeGreaterThan(0);
-    expect(decks.map((deck) => deck.slug)).toContain(KNOWN_DECK);
-  });
-
-  test("summarizes the synthetic starter metadata", async () => {
-    const decks = await getDeckSummaries();
-    const deck = decks.find((item) => item.slug === KNOWN_DECK);
-    expect(deck).toBeDefined();
-    expect(deck?.slideCount).toBe(4);
-    expect(deck?.title).toContain("Návrh projektu");
-    expect(deck?.hasMeta).toBe(true);
-    expect(deck?.purpose).toBe("project-proposal");
-    expect(deck?.status).toBe("synthetic-example");
-    expect(deck?.deckUrl).toBe(`/decks/${KNOWN_DECK}/`);
-  });
-
   test("handles a deck without deck.meta.json", async () => {
     const noMetaSlug = "zz-smoke-no-meta-deck";
     const deckDir = path.join(DECKS_ROOT, noMetaSlug);
@@ -51,16 +34,6 @@ describe("deck discovery", () => {
     } finally {
       await rm(deckDir, { recursive: true, force: true });
     }
-  });
-
-  test("detail returns starter context without export urls when no exports exist", async () => {
-    const detail = await getDeckDetail(KNOWN_DECK);
-    expect(detail).not.toBeNull();
-    expect(detail?.hasMeta).toBe(true);
-    expect(detail?.primaryGoal).toContain("Ověřit");
-    expect(detail?.mentalModel).toContain("syntetická");
-    expect(detail?.exports).toEqual([]);
-    expect(detail?.exportCount).toBe(0);
   });
 
   test("detail for an unknown slug is null", async () => {

@@ -16,7 +16,10 @@ Standard `MS-19`), on the stack profile `app@2026.12`.
 
 - `@lazurio/module-kit` v0.4.0 (profile release `2026.12`).
 - Who came, through `appAccess` on every request for content (`/api/decks`,
-  `/decks/`, `/exports/`): no application role gets `403`. An Application User
+  `/decks/`, `/exports/` and the first-slide `/previews/`): no application
+  role gets `403`. The decision is made on the path as it is read (decoded,
+  dot segments resolved), so an encoded spelling of a content path is content
+  too, in the development run and the built one alike. An Application User
   and an Application Admin read alike; the App changes nothing (generation
   `v1`). Health and the client itself need no role.
 

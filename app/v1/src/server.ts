@@ -2,6 +2,7 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { allowedHosts, appAccess, listener, ModuleKitError, onShutdown } from "@lazurio/module-kit";
 import appPackage from "../package.json";
+import { DECKS_PREFIX, EXPORTS_PREFIX, isContentPath, logicalPath } from "./content-path.ts";
 import { getDeckDetail, getDeckSummaries } from "./decks.ts";
 import { type Relay, startDevelopmentClient } from "./dev-client.ts";
 import { hostAllowed, originAllowed } from "./host.ts";
@@ -17,9 +18,6 @@ import {
   resolveExportPath,
 } from "./paths.ts";
 import { clientDirectory, createStaticHandler } from "./static.ts";
-
-const DECKS_PREFIX = "/decks/";
-const EXPORTS_PREFIX = "/exports/";
 
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -131,12 +129,11 @@ async function route(req: Request): Promise<Response> {
   // 0231): the decks and their exports are the Organization's content, so no
   // application role gets nothing of them. An Application User and an
   // Application Admin read alike; the App changes nothing (generation v1).
-  // Health and the client itself need no role.
-  const isContent =
-    (pathname.startsWith("/api/") && pathname !== "/api/health") ||
-    pathname.startsWith(DECKS_PREFIX) ||
-    pathname.startsWith(EXPORTS_PREFIX);
-  if (isContent && appAccess(req, "web").appRole === null) return forbidden("no_application_role");
+  // The first-slide previews show a deck too. Health and the client itself
+  // need no role. The decision is made on the path as it is read
+  // (`logicalPath`), so no encoded variant slips past it.
+  if (isContentPath(pathname) && appAccess(req, "web").appRole === null)
+    return forbidden("no_application_role");
 
   if (req.method === "GET" && pathname === "/api/health") {
     return Response.json({
@@ -207,8 +204,12 @@ async function appPaths(): Promise<(pathname: string) => boolean> {
     EXPORTS_PREFIX,
     ...entries.filter((entry) => entry.isDirectory()).map((entry) => `/${entry.name}/`),
   ];
-  return (pathname) =>
-    files.has(pathname) || prefixes.some((prefix) => pathname.startsWith(prefix));
+  return (pathname) => {
+    // Decided on the path as it is read, so an encoded variant of an App path
+    // (`/%70reviews/…`) is answered here, under the same role check.
+    const logical = logicalPath(pathname) ?? pathname;
+    return files.has(logical) || prefixes.some((prefix) => logical.startsWith(prefix));
+  };
 }
 
 /**

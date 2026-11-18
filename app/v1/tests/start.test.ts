@@ -106,6 +106,7 @@ describe("start contract", () => {
             );
             expect((await fetchAs(origin, `/decks/${anyDeck}/`, hostedHost)).status).toBe(200);
           }
+          if (anyDeck) await previewsNeedARole(origin, anyDeck);
           // The hot-reload socket opens for the module's page, not for a page
           // elsewhere; Bun's error report refuses a page elsewhere too.
           expect(await hotReloadAnswers(origin, hostedOrigin)).toBe(true);
@@ -200,6 +201,7 @@ describe("start contract", () => {
             expect((await fetchAs(origin, `/api/decks/${anyDeck}`, hostedHost)).status).toBe(200);
             expect((await fetchAs(origin, `/decks/${anyDeck}/`, hostedHost)).status).toBe(200);
           }
+          if (anyDeck) await previewsNeedARole(origin, anyDeck);
           // A foreign Host stays refused on every route, whatever it forwards.
           for (const path of ["/", "/api/decks", "/api/health"]) {
             const spoofed = await fetchAs(origin, path, "foreign.invalid", {
@@ -298,6 +300,26 @@ function hotReloadAnswers(origin: string, pageOrigin: string): Promise<boolean> 
     socket.addEventListener("error", () => finish(false));
     socket.addEventListener("close", () => finish(false));
   });
+}
+
+/**
+ * A deck's first-slide preview is the Organization's content: at the hosted
+ * address it needs an application role, in every spelling of its path.
+ */
+async function previewsNeedARole(origin: string, deck: string): Promise<void> {
+  const spellings = [
+    `/previews/${deck}.jpg`,
+    `/%70reviews/${deck}.jpg`,
+    `/previews%2F${deck}.jpg`,
+    `//previews/${deck}.jpg`,
+  ];
+  for (const path of spellings) {
+    const refused = await fetchAs(origin, path, hostedHost, {}, false);
+    expect(refused.status, path).toBe(403);
+  }
+  const shown = await fetchAs(origin, `/previews/${deck}.jpg`, hostedHost);
+  expect(shown.status).toBe(200);
+  expect(shown.headers.get("content-type")).toContain("image/jpeg");
 }
 
 /** What Lazurio's gateway states for an Application User of the hosted App. */

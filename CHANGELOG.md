@@ -3,6 +3,23 @@
 The release version (semver) is independent of the app generation
 (`app/v1`).
 
+## Unreleased
+
+Ready as an Application of an Organization (Lazurio decision 0249, Module
+Standard `MS-19`), on the stack profile `app@2026.12`.
+
+### For people
+
+- Nothing changes in how the App is used.
+
+### For whoever runs it
+
+- `@lazurio/module-kit` v0.4.0 (profile release `2026.12`).
+- Who came, through `appAccess` on every request for content (`/api/decks`,
+  `/decks/`, `/exports/`): no application role gets `403`. An Application User
+  and an Application Admin read alike; the App changes nothing (generation
+  `v1`). Health and the client itself need no role.
+
 ## 0.2.1 — 2026-11-12
 
 A fix release: a module hosted by Lazurio opens at its own address. The App

@@ -10,6 +10,7 @@ describe("formatDay", () => {
   test("anything else stays as written", () => {
     expect(formatDay("2026-11", "cs")).toBe("2026-11");
     expect(formatDay("2026-02-30", "cs")).toBe("2026-02-30");
+    expect(formatDay("0099-11-02", "en")).toBe("0099-11-02");
     expect(formatDay("listopad 2026", "en")).toBe("listopad 2026");
   });
 });

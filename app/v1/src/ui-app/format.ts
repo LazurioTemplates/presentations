@@ -14,7 +14,14 @@ export function formatDay(value: string, language: UiLanguage = "cs"): string {
   if (!match) return value;
   const [, year, month, day] = match.map(Number);
   const date = new Date(Date.UTC(year, month - 1, day));
-  if (date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return value;
+  // Date.UTC reads the years 0–99 as 1900–1999 and rolls an impossible day
+  // over; either way the date shown would differ from the one written.
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  )
+    return value;
   return new Intl.DateTimeFormat(language === "cs" ? "cs-CZ" : "en-GB", {
     dateStyle: "medium",
     timeZone: "UTC",

@@ -119,9 +119,11 @@ longer drags the library behind it:
    `app/v1/src/ui-app/index.css`, adds `app/v1/tests/format.test.ts` and sets
    `version` in `app/v1/package.json`. No dependency, data or deck changes,
    so `bun install` and `deck:build` have nothing to do.
-2. **Conflicts.** Only if you changed the card, the detail or the drawer's
-   styles yourself: a deck's date goes through `formatDay(value, language)`,
-   and `.drawer-panel` keeps `overscroll-behavior: contain`.
+2. **Conflicts.** Only in a file of step 1 that you changed yourself. In
+   `package.json` keep your own dependencies and take the template's
+   `version`. In `format.ts`, the card and the detail, a deck's date goes
+   through `formatDay(value, language)`. In `index.css`, `.drawer-panel`
+   keeps `overscroll-behavior: contain`.
 3. `bun run check`, pull request, and after the merge open a deck's detail
    in Lazurio and check its dates.
 

@@ -8,9 +8,9 @@ The release version (semver) is independent of the app generation
 ### For whoever runs it
 
 - The stack profile release `app@2027.01`: `@lazurio/module-kit` v0.5.0
-  instead of v0.4.0. A production application offers an agent no
-  publication until the Owner decides how the App knows the person's
-  "Publikuj" (0.5.0). Decks and the look do not change. See
+  instead of v0.4.0. module-kit 0.5.0 still offers an agent no publication
+  tool in a production application; a later kit release lifts that. Decks and
+  the look do not change. See
   [From 0.3.1 to 0.4.0](docs/extending.md#from-031-to-040).
 
 ## 0.3.1 — 2026-11-19

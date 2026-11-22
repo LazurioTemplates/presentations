@@ -5,10 +5,10 @@ unplanned migrations. Only two kinds of stack change exist: a **profile
 release** (tool versions inside one generation) and a **generation change**
 (the data layer). Everything else stays within the pinned stack.
 
-This release follows the stack profile `app@2026.12`
+This release follows the stack profile `app@2027.01`
 ([Lazurio stack profiles](https://github.com/Lazurio/LazurioPlatform/blob/main/docs/stack-profiles.md#app)):
 Bun 1.4.4, TypeScript 7.0.2, Biome 2.6.4, Vite 8.3.5, React 19.3.1 and
-`@lazurio/module-kit` v0.4.0.
+`@lazurio/module-kit` v0.5.0.
 
 ## Within generation v1
 
@@ -107,6 +107,25 @@ Keep your decks, identity, lease and `app/v1/src/instance.ts`; resolve
 conflicts in your own code consciously; run `bun run deck:build` and
 `bun run check`. Read the release's CHANGELOG entry first. Open a pull
 request; declining it keeps your current version.
+
+### From 0.3.1 to 0.4.0
+
+Release 0.4.0 moves the App onto the stack profile `app@2027.01`, with
+`@lazurio/module-kit` v0.5.0. Decks, slides and the look do not change:
+
+1. **Merge `v0.4.0`.** It changes `@lazurio/module-kit` in
+   `app/v1/package.json` and `bun.lock`, and the stack line of `AGENTS.md`.
+   Run `bun install --frozen-lockfile`; decks need no rebuild.
+2. **Conflicts.** Only in a file of step 1 that you changed yourself. In
+   `app/v1/package.json` keep your own dependencies, among them the pin of
+   your design system, and take the template's module-kit and `version`. In
+   `AGENTS.md` keep your Organization's own sections and take the template's
+   stack line.
+3. `bun run check`, pull request, and after the merge open the library and a
+   deck in Lazurio.
+
+A module on 0.2.x follows [From 0.2.1 to 0.3.0](#from-021-to-030) with the
+tag `v0.4.0` instead of `v0.3.0`; it brings these changes too.
 
 ### From 0.3.0 to 0.3.1
 
@@ -248,4 +267,4 @@ then adapt `app/v1/src/deck/theme.ts` in the same pull request.
 ## Releasing the template
 
 See [release.md](release.md). The registry checks that this file names the
-stack profile `app@2026.12`.
+stack profile `app@2027.01`.

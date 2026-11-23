@@ -28,6 +28,12 @@ Bun 1.4.4, TypeScript 7.0.2, Biome 2.6.4, Vite 8.3.5, React 19.3.1 and
   a test fails when one language misses a text.
 - **The Organization's default language**: `app/v1/src/instance.ts`.
 - UI and API changes in `app/v1/src`, with tests in `app/v1/tests`.
+- **Tools for agents.** A tool is defined once in
+  `app/v1/src/agent-tools.ts`, calls the library's API (`app/v1/src/api.ts`)
+  and is offered on `/mcp` and to the page. Its description goes into
+  `TOOL_MESSAGES` in both languages and its contract into
+  `app/v1/tests/agent-tools.test.ts`. Generation v1 changes nothing, so a
+  tool only reads (`effect: "read"`); writing decks stays a pull request.
 - Security patch versions of a dependency, exact pin, with `bun.lock`.
 
 Every change: task worktree, `bun run check` green, a look in the browser

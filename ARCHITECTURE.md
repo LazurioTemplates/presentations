@@ -46,6 +46,14 @@ language when the deck has it, else its primary language, so one screen
 never mixes languages. `src/ui-app/` is the React library; its language
 comes from the address, Lazurio's shell document or `src/instance.ts`.
 
+`src/api.ts` is the library's read-only API (`/api/decks`,
+`/api/decks/<slug>`). `src/agent-tools.ts` offers the same answers as tools
+for agents (`list_decks`, `get_deck`), one registry of module-kit on `/mcp`
+and for the page on `/api/agent-tools`; each tool calls the API in process
+with the caller's headers. The page registers them with module-kit's
+`webmcp`. Who came is read through `appAccess` of the listener `web`, for the
+tools by the registry, before the server's own content check.
+
 ## Boundaries
 
 Paths and symlinks cannot leave the deck and export stores; the server

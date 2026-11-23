@@ -12,6 +12,23 @@ The release version (semver) is independent of the app generation
   tool in a production application; a later kit release lifts that. Decks and
   the look do not change. See
   [From 0.3.1 to 0.4.0](docs/extending.md#from-031-to-040).
+- The server's TypeScript project (`tsconfig.node.json`) includes the `DOM`
+  library, as module-kit's `tools` needs for its `Request`; a frame of the
+  development client's hot-reload relay is typed accordingly. Nothing runs
+  differently.
+
+### For agents
+
+- Tools for agents, defined once on the server (`app/v1/src/agent-tools.ts`,
+  `@lazurio/module-kit/tools`) and offered on `/mcp` of the Application and
+  to the page (`/api/agent-tools`, registered by
+  `@lazurio/module-kit/webmcp`): `list_decks` answers what `GET /api/decks`
+  does and `get_deck` what `GET /api/decks/<id>` does, with an optional
+  `language` (default the App's). Both only read, from the Application User
+  role up, and call the library's own API in process
+  (`app/v1/src/api.ts`). No tool writes: a deck changes only by a pull
+  request. Their descriptions speak the App's language (`src/instance.ts`).
+  Without a role `/mcp` and the page refuse with `identity_unavailable`.
 
 ## 0.3.1 — 2026-11-19
 

@@ -37,6 +37,9 @@ It is a free template of the Lazurio Marketplace, released under the
   prepare a deck from sources (`deck-from-sources`), a personal version for
   a prospect (`deck-personal-version`), add a slide of a given type
   (`deck-add-slide`).
+- **Tools for agents.** The library as two reading tools, `list_decks` and
+  `get_deck`, defined once on the server: on `/mcp` of the Application and
+  as WebMCP tools in the Environment browser. Neither changes anything.
 
 The only bundled deck is a sample offer of the invented company Example,
 in Czech and English, using every slide type. No customer data.

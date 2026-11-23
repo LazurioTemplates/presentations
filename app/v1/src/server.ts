@@ -2,8 +2,9 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { allowedHosts, appAccess, listener, ModuleKitError, onShutdown } from "@lazurio/module-kit";
 import appPackage from "../package.json";
+import { createAgentTools } from "./agent-tools.ts";
+import { decksApi, LISTENER } from "./api.ts";
 import { DECKS_PREFIX, EXPORTS_PREFIX, isContentPath, logicalPath } from "./content-path.ts";
-import { getDeckDetail, getDeckSummaries } from "./decks.ts";
 import { type Relay, startDevelopmentClient } from "./dev-client.ts";
 import { hostAllowed, originAllowed } from "./host.ts";
 import type { HealthResponse } from "./model.ts";
@@ -125,6 +126,13 @@ async function route(req: Request): Promise<Response> {
   // hosted address is not foreign (see hostAllowed).
   if (!hostAllowed(req, hosts)) return forbidden("foreign_host");
 
+  // The tools for agents (`agent-tools.ts`) on `/mcp` and for the page on
+  // `/api/agent-tools`. The registry reads who came itself, through the same
+  // `appAccess`, and refuses a request without a role with `identity_unavailable`.
+  if (pathname === "/mcp") return tools.handleMcp(req);
+  const toolPage = await tools.handlePage(req);
+  if (toolPage) return toolPage;
+
   // Who came, read from Lazurio for every request and never cached (decision
   // 0231): the decks and their exports are the Organization's content, so no
   // application role gets nothing of them. An Application User and an
@@ -132,7 +140,7 @@ async function route(req: Request): Promise<Response> {
   // The first-slide previews show a deck too. Health and the client itself
   // need no role. The decision is made on the path as it is read
   // (`logicalPath`), so no encoded variant slips past it.
-  if (isContentPath(pathname) && appAccess(req, "web").appRole === null)
+  if (isContentPath(pathname) && appAccess(req, LISTENER).appRole === null)
     return forbidden("no_application_role");
 
   if (req.method === "GET" && pathname === "/api/health") {
@@ -144,25 +152,8 @@ async function route(req: Request): Promise<Response> {
       module: appPackage.lazurio.runtime.module,
     } satisfies HealthResponse);
   }
-  const language = url.searchParams.get("lang") ?? undefined;
-  if (req.method === "GET" && pathname === "/api/decks") {
-    return Response.json({
-      decks: await getDeckSummaries(language),
-      generatedAt: new Date().toISOString(),
-    });
-  }
-  const detailMatch = pathname.match(/^\/api\/decks\/([^/]+)$/);
-  if (req.method === "GET" && detailMatch) {
-    let slug: string;
-    try {
-      slug = decodeURIComponent(detailMatch[1]);
-    } catch {
-      return Response.json({ error: "malformed_slug" }, { status: 400 });
-    }
-    const detail = await getDeckDetail(slug, language);
-    if (!detail) return Response.json({ error: "not_found" }, { status: 404 });
-    return Response.json(detail);
-  }
+  const apiResponse = await decksApi(req);
+  if (apiResponse) return apiResponse;
 
   if (req.method === "GET" && pathname.startsWith(DECKS_PREFIX)) {
     const deckResponse = await serveDeck(pathname);
@@ -198,6 +189,8 @@ async function appPaths(): Promise<(pathname: string) => boolean> {
   const files = new Set(
     entries.filter((entry) => !entry.isDirectory()).map((entry) => `/${entry.name}`),
   );
+  // `/mcp` is the App's too: the tools for agents answer it.
+  files.add("/mcp");
   const prefixes = [
     "/api/",
     DECKS_PREFIX,
@@ -272,9 +265,11 @@ async function fetchWithErrors(req: Request): Promise<Response> {
 // listener's external origin; a local run has no external origin.
 let web: ReturnType<typeof listener>;
 let hosts: ReadonlySet<string>;
+let tools: ReturnType<typeof createAgentTools>;
 try {
-  web = listener("web");
-  hosts = new Set(allowedHosts("web"));
+  web = listener(LISTENER);
+  hosts = new Set(allowedHosts(LISTENER));
+  tools = createAgentTools({ api: decksApi });
 } catch (error) {
   if (!(error instanceof ModuleKitError)) throw error;
   console.error(`Start through Lazurio lifecycle: ${error.message}`);

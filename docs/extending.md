@@ -5,10 +5,10 @@ unplanned migrations. Only two kinds of stack change exist: a **profile
 release** (tool versions inside one generation) and a **generation change**
 (the data layer). Everything else stays within the pinned stack.
 
-This release follows the stack profile `app@2027.01`
+This release follows the stack profile `app@2027.02`
 ([Lazurio stack profiles](https://github.com/Lazurio/LazurioPlatform/blob/main/docs/stack-profiles.md#app)):
 Bun 1.4.4, TypeScript 7.0.2, Biome 2.6.4, Vite 8.3.5, React 19.3.1 and
-`@lazurio/module-kit` v0.5.0.
+`@lazurio/module-kit` v0.6.0.
 
 ## Within generation v1
 
@@ -116,8 +116,8 @@ request; declining it keeps your current version.
 
 ### From 0.3.1 to 0.4.0
 
-Release 0.4.0 moves the App onto the stack profile `app@2027.01`, with
-`@lazurio/module-kit` v0.5.0. Decks, slides and the look do not change:
+Release 0.4.0 moves the App onto the stack profile `app@2027.02`, with
+`@lazurio/module-kit` v0.6.0. Decks, slides and the look do not change:
 
 1. **Merge `v0.4.0`.** It changes `@lazurio/module-kit` in
    `app/v1/package.json` and `bun.lock`, and the stack line of `AGENTS.md`.
@@ -273,4 +273,4 @@ then adapt `app/v1/src/deck/theme.ts` in the same pull request.
 ## Releasing the template
 
 See [release.md](release.md). The registry checks that this file names the
-stack profile `app@2027.01`.
+stack profile `app@2027.02`.

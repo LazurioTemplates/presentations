@@ -81,8 +81,8 @@ request into the module (the skills above). A new tool goes into
 
 ## Stack
 
-Stack profile `app@2027.01` of Lazurio: Bun 1.4.4, TypeScript 7.0.2, Biome
-2.6.4, Vite 8.3.5, React 19.3.1, `bun test`, `@lazurio/module-kit` v0.5.0.
+Stack profile `app@2027.02` of Lazurio: Bun 1.4.4, TypeScript 7.0.2, Biome
+2.6.4, Vite 8.3.5, React 19.3.1, `bun test`, `@lazurio/module-kit` v0.6.0.
 Every dependency has an exact version and `bun.lock` is committed. Change
 the stack only through a profile release or a generation change, see
 [docs/extending.md](docs/extending.md).

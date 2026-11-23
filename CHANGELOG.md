@@ -7,9 +7,9 @@ The release version (semver) is independent of the app generation
 
 ### For whoever runs it
 
-- The stack profile release `app@2027.01`: `@lazurio/module-kit` v0.5.0
-  instead of v0.4.0. module-kit 0.5.0 still offers an agent no publication
-  tool in a production application; a later kit release lifts that. Decks and
+- The stack profile release `app@2027.02`: `@lazurio/module-kit` v0.6.0
+  instead of v0.4.0. module-kit 0.6.0 offers an App's publication tools in a
+  production application too; this template has none, its tools only read. Decks and
   the look do not change. See
   [From 0.3.1 to 0.4.0](docs/extending.md#from-031-to-040).
 - The server's TypeScript project (`tsconfig.node.json`) includes the `DOM`

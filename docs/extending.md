@@ -136,9 +136,9 @@ to the page. Decks, slides and the look do not change:
      which the module kit's tool types need;
    - tests: `app/v1/tests/agent-tools.test.ts` (new), `start.test.ts`,
      `template.test.ts`;
-   - `AGENTS.md`, `ARCHITECTURE.md`, `README.md`, the skill
-     `deck-personal-version` (`.agents/skills/` and `.claude/skills/`) and
-     `CHANGELOG.md`.
+   - `AGENTS.md`, `ARCHITECTURE.md`, `README.md`, `docs/extending.md` (this
+     guide), the skill `deck-personal-version` (`.agents/skills/` and
+     `.claude/skills/`) and `CHANGELOG.md`.
 
    Run `bun install --frozen-lockfile`; decks need no rebuild.
 2. **Conflicts.** Only in a file of step 1 that you changed yourself:
@@ -154,6 +154,12 @@ to the page. Decks, slides and the look do not change:
      lines and keep yours.
    - `AGENTS.md` and the skill: keep your Organization's own sections and take
      the template's stack line and the section "Tools for agents".
+   - `docs/extending.md`, `ARCHITECTURE.md` and `README.md`: keep the sections
+     you wrote yourself and take the template's sections as they are, among
+     them this migration section. When you rewrote a template section, keep
+     your text and add what the template's new text says that yours does not.
+   - `CHANGELOG.md`: keep your own entries and take the template's release
+     section.
    - A deck or a test of your own: nothing of the template touches it.
 3. `bun run check`, pull request, and after the merge open the library and a
    deck in Lazurio. In the Environment browser `agent-browser webmcp list`

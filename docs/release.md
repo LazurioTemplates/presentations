@@ -7,9 +7,12 @@ commit; everything after it arrives through reviewed pull requests.
    from AGENTS.md on the merged commit.
 2. Prepare the release commit in its own reviewed PR (`release/v<version>`):
    the CHANGELOG heading gets the date (`## <version> — YYYY-MM-DD`) and the
-   **Status** line of [marketplace.md](marketplace.md) names the version as
-   published, so the tag never calls its own release unreleased.
-   `tests/template.test.ts` fails while the two disagree.
+   **Status** line of [marketplace.md](marketplace.md) adds the version to
+   the releases "in the CHANGELOG". The line never calls a version published:
+   a release is published once its tag `v<version>` has a GitHub Release
+   (step 5), so the line stays true before and after the tag.
+   `tests/template.test.ts` fails while the Status line and the CHANGELOG
+   disagree.
 3. Audit the tree to be published: `git ls-tree -r <commit>` and its content,
    as in [the listing checklist](marketplace.md).
 4. Enable immutable releases in the repository settings before the first

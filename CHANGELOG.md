@@ -5,6 +5,8 @@ The release version (semver) is independent of the app generation
 
 ## Unreleased
 
+## 0.4.0 — 2026-11-24
+
 ### For whoever runs it
 
 - The stack profile release `app@2027.02`: `@lazurio/module-kit` v0.6.0

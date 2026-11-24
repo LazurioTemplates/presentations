@@ -22,4 +22,5 @@ void resolveLanguage(window.location.search).then((language) => {
 // (`src/agent-tools.ts`), registered where the browser offers WebMCP; each
 // call goes to the same handler as `/mcp`. The library never changes them
 // while it is open, so it registers them once.
-void registerAgentTools();
+// Without WebMCP or when registration fails, the page works the same.
+void registerAgentTools().catch(() => {});

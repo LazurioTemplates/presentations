@@ -117,18 +117,47 @@ request; declining it keeps your current version.
 ### From 0.3.1 to 0.4.0
 
 Release 0.4.0 moves the App onto the stack profile `app@2027.02`, with
-`@lazurio/module-kit` v0.6.0. Decks, slides and the look do not change:
+`@lazurio/module-kit` v0.6.0, and gives agents the library's tools on the
+server: `list_decks` and `get_deck`, offered on `/mcp` of the Application and
+to the page. Decks, slides and the look do not change:
 
-1. **Merge `v0.4.0`.** It changes `@lazurio/module-kit` in
-   `app/v1/package.json` and `bun.lock`, and the stack line of `AGENTS.md`.
+1. **Merge `v0.4.0`.** It changes:
+   - `app/v1/package.json` and `bun.lock`: `@lazurio/module-kit` v0.6.0;
+   - `app/v1/src/api.ts` (new): the read-only API of the library
+     (`/api/decks`, `/api/decks/<id>`), moved out of `app/v1/src/server.ts`
+     with the same answers;
+   - `app/v1/src/agent-tools.ts` (new): the tools for agents over that API;
+   - `app/v1/src/server.ts`: `/mcp` and `/api/agent-tools` answered before the
+     content check, the library routes through `api.ts`;
+   - `app/v1/src/dev-client.ts`: `/mcp` served by the App in a development run;
+   - `app/v1/src/ui-app/main.tsx`: the page registers the tools
+     (`registerAgentTools` of `@lazurio/module-kit/webmcp`);
+   - `app/v1/tsconfig.node.json`: the server project takes the `DOM` library,
+     which the module kit's tool types need;
+   - tests: `app/v1/tests/agent-tools.test.ts` (new), `start.test.ts`,
+     `template.test.ts`;
+   - `AGENTS.md`, `ARCHITECTURE.md`, `README.md`, the skill
+     `deck-personal-version` (`.agents/skills/` and `.claude/skills/`) and
+     `CHANGELOG.md`.
+
    Run `bun install --frozen-lockfile`; decks need no rebuild.
-2. **Conflicts.** Only in a file of step 1 that you changed yourself. In
-   `app/v1/package.json` keep your own dependencies, among them the pin of
-   your design system, and take the template's module-kit and `version`. In
-   `AGENTS.md` keep your Organization's own sections and take the template's
-   stack line.
+2. **Conflicts.** Only in a file of step 1 that you changed yourself:
+   - `app/v1/package.json`: keep your own dependencies, among them the pin of
+     your design system, and take the template's module-kit and `version`.
+   - `app/v1/src/server.ts`: keep your own routes and checks and take the
+     template's order: Host check, then `/mcp` and `handlePage` of the tools,
+     then the content check and your routes. A route of your own under
+     `/api/decks` now belongs in `api.ts`, so the tools see it too.
+   - `app/v1/src/ui-app/main.tsx`: keep your own start of the page and add the
+     template's `registerAgentTools` call after it.
+   - `app/v1/src/dev-client.ts` and `tsconfig.node.json`: take the template's
+     lines and keep yours.
+   - `AGENTS.md` and the skill: keep your Organization's own sections and take
+     the template's stack line and the section "Tools for agents".
+   - A deck or a test of your own: nothing of the template touches it.
 3. `bun run check`, pull request, and after the merge open the library and a
-   deck in Lazurio.
+   deck in Lazurio. In the Environment browser `agent-browser webmcp list`
+   lists `list_decks` and `get_deck`.
 
 A module on 0.2.x follows [From 0.2.1 to 0.3.0](#from-021-to-030) with the
 tag `v0.4.0` instead of `v0.3.0`; it brings these changes too.

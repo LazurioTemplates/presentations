@@ -1,3 +1,4 @@
+import { registerAgentTools } from "@lazurio/module-kit/webmcp";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "design-system/styles.css";
@@ -16,3 +17,10 @@ void resolveLanguage(window.location.search).then((language) => {
     </React.StrictMode>,
   );
 });
+
+// The tools for agents, as the server lists them for the person
+// (`src/agent-tools.ts`), registered where the browser offers WebMCP; each
+// call goes to the same handler as `/mcp`. The library never changes them
+// while it is open, so it registers them once.
+// Without WebMCP or when registration fails, the page works the same.
+void registerAgentTools().catch(() => {});

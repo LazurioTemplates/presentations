@@ -28,7 +28,9 @@ lasting deck made for one client, that is a new deck (skill
 
 - The deck's page: `/decks/<slug>/` for its primary language,
   `/decks/<slug>/index.<language>.html` for another one (`deck.meta.json`,
-  `variants`).
+  `variants`). The App's tools for agents find it too: `list_decks` and
+  `get_deck` (its `languages` and `deckUrl` in each language), on `/mcp` of
+  the Application or as WebMCP tools in the Environment browser.
 - Add `for=<name>` and `org=<organization>`, URL-encoded
   (`encodeURIComponent`), for example
   `/decks/2026-11-02-example-office-coffee/index.en.html?for=Jane%20Doe&org=Sample%20Studio`.

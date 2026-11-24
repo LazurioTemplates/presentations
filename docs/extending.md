@@ -5,10 +5,10 @@ unplanned migrations. Only two kinds of stack change exist: a **profile
 release** (tool versions inside one generation) and a **generation change**
 (the data layer). Everything else stays within the pinned stack.
 
-This release follows the stack profile `app@2026.12`
+This release follows the stack profile `app@2027.02`
 ([Lazurio stack profiles](https://github.com/Lazurio/LazurioPlatform/blob/main/docs/stack-profiles.md#app)):
 Bun 1.4.4, TypeScript 7.0.2, Biome 2.6.4, Vite 8.3.5, React 19.3.1 and
-`@lazurio/module-kit` v0.4.0.
+`@lazurio/module-kit` v0.6.0.
 
 ## Within generation v1
 
@@ -28,6 +28,12 @@ Bun 1.4.4, TypeScript 7.0.2, Biome 2.6.4, Vite 8.3.5, React 19.3.1 and
   a test fails when one language misses a text.
 - **The Organization's default language**: `app/v1/src/instance.ts`.
 - UI and API changes in `app/v1/src`, with tests in `app/v1/tests`.
+- **Tools for agents.** A tool is defined once in
+  `app/v1/src/agent-tools.ts`, calls the library's API (`app/v1/src/api.ts`)
+  and is offered on `/mcp` and to the page. Its description goes into
+  `TOOL_MESSAGES` in both languages and its contract into
+  `app/v1/tests/agent-tools.test.ts`. Generation v1 changes nothing, so a
+  tool only reads (`effect: "read"`); writing decks stays a pull request.
 - Security patch versions of a dependency, exact pin, with `bun.lock`.
 
 Every change: task worktree, `bun run check` green, a look in the browser
@@ -107,6 +113,60 @@ Keep your decks, identity, lease and `app/v1/src/instance.ts`; resolve
 conflicts in your own code consciously; run `bun run deck:build` and
 `bun run check`. Read the release's CHANGELOG entry first. Open a pull
 request; declining it keeps your current version.
+
+### From 0.3.1 to 0.4.0
+
+Release 0.4.0 moves the App onto the stack profile `app@2027.02`, with
+`@lazurio/module-kit` v0.6.0, and gives agents the library's tools on the
+server: `list_decks` and `get_deck`, offered on `/mcp` of the Application and
+to the page. Decks, slides and the look do not change:
+
+1. **Merge `v0.4.0`.** It changes:
+   - `app/v1/package.json` and `bun.lock`: `@lazurio/module-kit` v0.6.0;
+   - `app/v1/src/api.ts` (new): the read-only API of the library
+     (`/api/decks`, `/api/decks/<id>`), moved out of `app/v1/src/server.ts`
+     with the same answers;
+   - `app/v1/src/agent-tools.ts` (new): the tools for agents over that API;
+   - `app/v1/src/server.ts`: `/mcp` and `/api/agent-tools` answered before the
+     content check, the library routes through `api.ts`;
+   - `app/v1/src/dev-client.ts`: `/mcp` served by the App in a development run;
+   - `app/v1/src/ui-app/main.tsx`: the page registers the tools
+     (`registerAgentTools` of `@lazurio/module-kit/webmcp`);
+   - `app/v1/tsconfig.node.json`: the server project takes the `DOM` library,
+     which the module kit's tool types need;
+   - tests: `app/v1/tests/agent-tools.test.ts` (new), `start.test.ts`,
+     `template.test.ts`;
+   - `AGENTS.md`, `ARCHITECTURE.md`, `README.md`, `docs/extending.md` (this
+     guide), the skill `deck-personal-version` (`.agents/skills/` and
+     `.claude/skills/`) and `CHANGELOG.md`.
+
+   Run `bun install --frozen-lockfile`; decks need no rebuild.
+2. **Conflicts.** Only in a file of step 1 that you changed yourself:
+   - `app/v1/package.json`: keep your own dependencies, among them the pin of
+     your design system, and take the template's module-kit and `version`.
+   - `app/v1/src/server.ts`: keep your own routes and checks and take the
+     template's order: Host check, then `/mcp` and `handlePage` of the tools,
+     then the content check and your routes. A route of your own under
+     `/api/decks` now belongs in `api.ts`, so the tools see it too.
+   - `app/v1/src/ui-app/main.tsx`: keep your own start of the page and add the
+     template's `registerAgentTools` call after it.
+   - `app/v1/src/dev-client.ts` and `tsconfig.node.json`: take the template's
+     lines and keep yours.
+   - `AGENTS.md` and the skill: keep your Organization's own sections and take
+     the template's stack line and the section "Tools for agents".
+   - `docs/extending.md`, `ARCHITECTURE.md` and `README.md`: keep the sections
+     you wrote yourself and take the template's sections as they are, among
+     them this migration section. When you rewrote a template section, keep
+     your text and add what the template's new text says that yours does not.
+   - `CHANGELOG.md`: keep your own entries and take the template's release
+     section.
+   - A deck or a test of your own: nothing of the template touches it.
+3. `bun run check`, pull request, and after the merge open the library and a
+   deck in Lazurio. In the Environment browser `agent-browser webmcp list`
+   lists `list_decks` and `get_deck`.
+
+A module on 0.2.x follows [From 0.2.1 to 0.3.0](#from-021-to-030) with the
+tag `v0.4.0` instead of `v0.3.0`; it brings these changes too.
 
 ### From 0.3.0 to 0.3.1
 
@@ -248,4 +308,4 @@ then adapt `app/v1/src/deck/theme.ts` in the same pull request.
 ## Releasing the template
 
 See [release.md](release.md). The registry checks that this file names the
-stack profile `app@2026.12`.
+stack profile `app@2027.02`.

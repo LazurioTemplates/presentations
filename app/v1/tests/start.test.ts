@@ -107,6 +107,7 @@ describe("start contract", () => {
             expect((await fetchAs(origin, `/decks/${anyDeck}/`, hostedHost)).status).toBe(200);
           }
           if (anyDeck) await previewsNeedARole(origin, anyDeck);
+          await toolsForAgents(origin);
           // The hot-reload socket opens for the module's page, not for a page
           // elsewhere; Bun's error report refuses a page elsewhere too.
           expect(await hotReloadAnswers(origin, hostedOrigin)).toBe(true);
@@ -202,6 +203,7 @@ describe("start contract", () => {
             expect((await fetchAs(origin, `/decks/${anyDeck}/`, hostedHost)).status).toBe(200);
           }
           if (anyDeck) await previewsNeedARole(origin, anyDeck);
+          await toolsForAgents(origin);
           // A foreign Host stays refused on every route, whatever it forwards.
           for (const path of ["/", "/api/decks", "/api/health"]) {
             const spoofed = await fetchAs(origin, path, "foreign.invalid", {
@@ -322,6 +324,36 @@ async function previewsNeedARole(origin: string, deck: string): Promise<void> {
   expect(shown.headers.get("content-type")).toContain("image/jpeg");
 }
 
+/**
+ * The tools for agents at the hosted address: `/mcp` and the page's manifest
+ * list them for an Application User, refuse nobody with
+ * `identity_unavailable` and refuse a foreign Host like every other route.
+ */
+async function toolsForAgents(origin: string): Promise<void> {
+  const list = (host: string, asGateway = true) =>
+    fetchAs(
+      origin,
+      "/mcp",
+      host,
+      { "content-type": "application/json", accept: "application/json, text/event-stream" },
+      asGateway,
+      JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }),
+    );
+  const listed = await list(hostedHost);
+  expect(listed.status).toBe(200);
+  const names = ((await listed.json()).result.tools as { name: string }[]).map((t) => t.name);
+  expect(names.sort()).toEqual(["get_app_context", "get_deck", "list_decks"]);
+  const nobody = await list(hostedHost, false);
+  expect(nobody.status).toBe(403);
+  expect((await nobody.json()).error).toBe("identity_unavailable");
+  expect((await list("foreign.invalid")).status).toBe(403);
+  const manifest = await fetchAs(origin, "/api/agent-tools", hostedHost);
+  expect(manifest.status).toBe(200);
+  const page = await fetchAs(origin, "/api/agent-tools", hostedHost, {}, false);
+  expect(page.status).toBe(403);
+  expect((await page.json()).reason).toBe("identity_unavailable");
+}
+
 /** What Lazurio's gateway states for an Application User of the hosted App. */
 const GATEWAY_USER: Record<string, string> = {
   [GATEWAY_HEADERS.subject]: "2659b76d-0000-4000-8000-000000000001",
@@ -334,7 +366,7 @@ const GATEWAY_USER: Record<string, string> = {
  * A request to the App on loopback that names `host` in its Host header. At
  * the hosted address it comes as through the gateway, from an Application
  * User, unless `asGateway` is false (then nobody is stated and the content is
- * refused).
+ * refused). With a `body` it is a POST.
  */
 function fetchAs(
   origin: string,
@@ -342,11 +374,13 @@ function fetchAs(
   host: string,
   headers: Record<string, string> = {},
   asGateway = true,
+  body?: string,
 ): Promise<Response> {
   const stated = asGateway && host === hostedHost ? GATEWAY_USER : {};
   return fetch(`${origin}${path}`, {
     headers: { ...stated, ...headers, host },
     redirect: "manual",
+    ...(body === undefined ? {} : { method: "POST", body }),
   });
 }
 

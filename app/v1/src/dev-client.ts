@@ -19,8 +19,12 @@ export interface Relay {
   target: string;
   upstream: WebSocket | null;
   /** Messages from the browser before the bundler's socket opened. */
-  pending: Array<string | Buffer>;
+  pending: Frame[];
 }
+
+/** A frame from the browser: text, or bytes over an ArrayBuffer of their own,
+ * as Bun hands them and as a socket sends them. */
+type Frame = string | Buffer<ArrayBuffer>;
 
 export interface DevelopmentClient {
   /** Answers a request for the client, or upgrades the hot-reload socket
@@ -87,8 +91,9 @@ export function startDevelopmentClient(page: HTMLBundle, loopbackHost: string): 
       },
       message(ws, message) {
         const { upstream } = ws.data;
-        if (upstream?.readyState === WebSocket.OPEN) upstream.send(message);
-        else ws.data.pending.push(message);
+        const frame = message as Frame;
+        if (upstream?.readyState === WebSocket.OPEN) upstream.send(frame);
+        else ws.data.pending.push(frame);
       },
       close(ws) {
         ws.data.upstream?.close();

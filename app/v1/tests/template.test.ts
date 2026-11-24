@@ -96,8 +96,11 @@ describe("template contract", () => {
         [...items].sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
       const published = ascending(released);
       expect(published.length).toBeGreaterThan(0);
-      let status = `${published.length === 1 ? "release" : "releases"} ${list(published)} published`;
+      // The listing names what the CHANGELOG holds, never that a release is
+      // published: that is the tag with its GitHub Release, made after merge.
+      let status = `${published.length === 1 ? "release" : "releases"} ${list(published)} in the CHANGELOG`;
       if (proposed.length > 0) status += `; ${list(ascending(proposed))} proposed, not released`;
+      status += "; a release is published once its tag `v<version>` has a GitHub Release";
       expect(read("docs/marketplace.md")).toContain(`**Status:** ${status}.`);
     },
   );
